@@ -1,0 +1,30 @@
+#piano {
+    position:absolute;
+    margin: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height:33vmin;
+    width: 98vmin;
+    border:5px solid black;
+    
+  }
+      .whitenote {
+    height:100%;
+    width:7vmin;
+    box-sizing: border-box;
+    background:white;
+    float: left;
+    border-right: 0.1vmin solid black;
+  }
+  
+  .blacknote {
+    height:65%;
+    width:3.5vmin;
+    transform: translateX(5.5vmin);
+    left:68%;
+    z-index:1;
+    background:#777;
+    
+  }

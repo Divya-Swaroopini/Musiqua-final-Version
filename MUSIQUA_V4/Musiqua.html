@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        #piano {
+  position:absolute;
+  margin: auto;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height:33vmin;
+  width: 98vmin;
+  border:5px solid black;
+  
+}
+    .whitenote {
+  height:100%;
+  width:7vmin;
+  box-sizing: border-box;
+  background:white;
+  float: left;
+  border-right: 0.1vmin solid black;
+}
+
+.blacknote {
+  height:65%;
+  width:3.5vmin;
+  transform: translateX(5.5vmin);
+  left:68%;
+  z-index:1;
+  background:#777;
+  
+}
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.4.9/Tone.js"></script>
+    <script src="Sliders.js"></script>
+    <script src="SynthPad.js"></script>
+    <link rel="stylesheet" href="StyleSheet.css">
+    <link rel="stylesheet" href="pianoStyle.css">
+</head>
+
+<body>
+
+<!-- Code for the Piano -->
+    <div id = 'piano'></div>
+        <script>
+            const piano = document.querySelector('#piano')
+        var data = ['C','D','E','F','G','A','B'];
+        
+            // var synth = new Tone.PolySynth(3, Tone.Synth).toMaster();
+let html = '';
+
+  
+for (var octave = 0; octave < 2; octave++)
+{
+ for (let i = 0; i < data.length; i++)
+  {
+      let hasSharp = (data[i]!='E' && data[i]!= 'B') ? true : false
+      html+=`<div class='whitenote' data-code='${data[i]}${octave+4}'>`
+      if(hasSharp){
+          html+=`<div class='blacknote' data-code='${data[i]}#${octave+4}'></div>`
+      }
+      html+=`</div>`
+//     var note = data[i];
+//     var hasSharp = (['E','B'].indexOf(note) == -1);
+
+// html += `<div class='whitenote' onmousedown='noteDown(this, false)' onmouseup='noteUp(this,false)' onmouseleave='noteUp(this,false)' data-note='${note + (octave+4)}'>`;
+
+//     if (hasSharp) {
+//       html += `<div class='blacknote' onmousedown='noteDown(this, true)' onmouseup='noteUp(this, true)' onmouseleave='noteUp(this,true)' data-note='${note + '#' + (octave+4)}'>
+           
+//       </div>`;
+//     }
+
+//     html += `</div>`; 
+   }
+}
+piano.insertAdjacentHTML('beforeend', html)
+
+const notes = document.querySelectorAll('.whitenote, .blacknote')
+const keys = ["Tab", "1", "q", "2", "w", "e", "4", "r", "5", "t", "6", "y", "u", "8", "i", "9", "o", "p", "-", "[", "=", "]", "Backspace", "\\"]
+const synth = new Tone.PolySynth(Tone.synth).toDestination()
+
+synth.set({
+    "envelope": {
+        "attack": 0.1,
+        "decay": 0.2,
+        "sustain": 0.8,
+        "release": 0.4
+    }
+})
+
+document.addEventListener('keydown', (e)=>{
+    e.preventDefault()
+    if(!e.repeat){
+        keys.forEach((key, index)=>{
+        if(e.key==key){
+            notes[index].style.background = (notes[index].classList.contains('whitenote')) ? '#ccc' : 'black'
+            synth.triggerAttackRelease(notes[index].dataset.code, '16n')
+        }
+    })
+    }
+})
+
+document.addEventListener('keyup', (e)=>{
+    keys.forEach((key, index)=>{
+        notes[index].style.background = (notes[index].classList.contains('whitenote')) ? 'white' : '#777'
+    })
+})
+        </script>
+<!-- cOde for recorder-->
+<!--
+<div class="output">
+    <label class="record">Record Output</label>
+    <input id="trigger-record" type="checkbox" checked>
+    <div class="record-output">
+      <h3>Audio Output:</h3>
+      <input type="button" value="Clear" onclick="javascript:eraseText();">
+      <pre>
+        <code class="language-js" id="gen-output">
+       
+        </code>    
+      </pre>
+    
+    </div>  
+</div>
+
+<script>   //output record
+
+    function addOutput(...output_data) {
+        let division = document.getElementById("gen-output");
+        division.innerHTML += output_data + ",";
+    }
+    
+    function eraseText() {
+        $("#gen-output").html("");
+    } 
+</script>
+-->
+
+
+<!-- Code for the ADSR Envelope -->
+
+<!-- Forked from Chris Coyier's pen : https://codepen.io/chriscoyier/pen/eYNQyPe -->
+
+
+<div id="Settings">
+    <div class="range-wrap">
+        <lable>Attack</lable>
+        <input type="range" class="range" min="0.05" max="1.0" value="0.5">
+        <output class="bubble"></output>
+    </div>
+    
+    <div class="range-wrap">
+        <lable>Decay</lable>
+        <input type="range" class="range" min="0.05" max="1.0" value="0.5"> 
+        <output class="bubble"></output>
+    </div>
+    
+    <div class="range-wrap">
+        <lable>Sustain</lable>
+        <input type="range" class="range" min="0.05" max="1.0" value="0.5">
+        <output class="bubble"></output>
+    </div>
+    
+    <div class="range-wrap">
+        <lable>Release</lable>
+        <input type="range" class="range" min="0.05" max="1.0" value="0.5">
+        <output class="bubble"></output>
+    </div>
+
+    <button id="submit" value="flase" onclick="change()">Update ADSR Envelope</button>
+</div>
+
+
+
+<!-- Code for the SynthPad -->
+
+    <div id="synth-wrapper" class="clearfix">
+        <canvas id="synth-pad"></canvas>
+        <div id="info">
+            <h1>Web Audio Synth Pad</h1>
+            <p>
+                Click and drag the mouse over the synthesizer pad to generate a sound.
+            </p>
+            <p>
+                Frequency: <span id="frequency">n/a</span>
+            </p>
+            <p>
+                Volume: <span id="volume">n/a</span>
+            </p>
+            <p>
+                <label for="waves">Choose Oscillator waveform  </label>
+                <select name="waves" id="waves">
+                <option value="sine">sine</option>
+                <option value="square">square</option>
+                <option value="triangle" selected>triangle</option>
+                <option value="sawtooth">sawtooth</option>
+                </select>
+            </p>
+        </div>
+    </div>
+
+</body>
+</html>
